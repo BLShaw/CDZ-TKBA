@@ -76,12 +76,13 @@ To  enhance a bio-inspired, **unsupervised multimodal learning system** capable 
 
 We have successfully built and tuned a full-scale unsupervised learning system.
 
-| Modality | Method | Accuracy - Hebbian (Unsupervised) | Accuracy - TKBA (Unsupervised) | Clusters Created | Interpretation |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Visual (MNIST)** | Linear Probe | 92.08% | 92.08% | N/A | The Autoencoder learned strong features. |
-| **Visual (MNIST)** | **TKBA Brain** | 85.00% (Clusters: 74) | 82.06% | ~1,700 | The system self-organized 60,000 images into prototypes with high purity. |
-| **Audio (FSDD)** | Linear Probe | 87.33% | 87.33% | N/A | Stable latent representation. |
-| **Audio (FSDD)** | **TKBA Brain** | 85.33% (Clusters: 14) | 85.67% | ~170 | The system separated spoken digits across speakers with robustness. |
+| Modality | Method | Accuracy - Hebbian (Unsupervised) | Accuracy - TKBA (Unsupervised) | Interpretation |
+| :--- | :--- | :--- | :--- | :--- |
+| **Visual (MNIST)** | Linear Probe (Supervised) | 92.08% | 92.08% | The Autoencoder learned strong features. |
+| **Visual (MNIST)** | Brain (Unsupervised) | 85.00% (Clusters: 74) | 82.06% (Clusters: 1711) | The system self-organized 60,000 images into prototypes with high purity. |
+| **Audio (FSDD)** | Linear Probe (Supervised) | 87.33% | 87.33% | Stable latent representation. |
+| **Audio (FSDD)** | Brain (Unsupervised) | 85.33% (Clusters: 14) | 85.67% (Clusters: 170) | The system separated spoken digits across speakers with robustness. |
+
 
 
 ### Key Takeaway
