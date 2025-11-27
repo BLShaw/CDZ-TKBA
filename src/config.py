@@ -1,6 +1,5 @@
 class Config:
     # General
-    DEVICE = 'cuda'  # Will be checked in main
     EPOCHS = 20
     TRAINING_SET_SIZE = 55000  # Full Training Set Size
     
@@ -34,9 +33,8 @@ class Config:
     NODE_SPLIT_MAX_QTY = max(int(TRAINING_SET_SIZE / 1000), 5)
 
     # TKBA Settings
-    # Visual (MNIST):
-    TKBA_VISUAL_SIGMA = 0.3      
-    TKBA_VISUAL_VIGILANCE = 0.6  
+    TKBA_VISUAL_SIGMA = 0.15     
+    TKBA_VISUAL_VIGILANCE = 0.45 
     
     # Audio (FSDD):
     TKBA_AUDIO_SIGMA = 0.15      
