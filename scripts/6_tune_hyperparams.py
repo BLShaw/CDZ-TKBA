@@ -18,8 +18,8 @@ from src.core.database import db
 param_grid = {
     'TKBA_VISUAL_SIGMA': [0.15, 0.3, 0.5],
     'TKBA_VISUAL_VIGILANCE': [0.45, 0.6, 0.75],
-    'TKBA_AUDIO_SIGMA': [0.15], 
-    'TKBA_AUDIO_VIGILANCE': [0.45]
+    'TKBA_AUDIO_SIGMA': [0.15],      # Audio is stable
+    'TKBA_AUDIO_VIGILANCE': [0.45]   # Audio is stable
 }
 
 # Reduced simulation steps for tuning speed (enough to see convergence trend)
@@ -54,7 +54,7 @@ def run_tuning_session(params):
     # We don't strictly need labels for the simulation, but we need them for evaluation score
     v_labels = np.load(os.path.join(enc_dir, 'visual_train_labels.npy'))[:10000]
     
-    # Audio (Optional for visual tuning, but good to keep loop consistent)
+    # Audio
     has_audio = os.path.exists(os.path.join(enc_dir, 'audio_train_encodings.npy'))
     if has_audio:
         a_enc = np.load(os.path.join(enc_dir, 'audio_train_encodings.npy'))
@@ -143,6 +143,7 @@ def main():
         print(f"Trial {i+1}/{len(combinations)}")
         
         v_acc, a_acc = run_tuning_session(current_params)
+        
         score = v_acc
         
         if score > best_score:
@@ -155,7 +156,10 @@ def main():
     print(f"Best Params: {best_params}")
     
     # Write best_config_found.py
-    with open('src/best_config_found.py', 'w') as f:
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    config_path = os.path.join(root_dir, 'src', 'best_config_found.py')
+    
+    with open(config_path, 'w') as f:
         f.write(f"""
 class Config:
     # General

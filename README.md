@@ -1,11 +1,7 @@
-# Multimodal Brain Project - Execution Guide
-
-A decoupled multimodal learning architecture using MNIST (Visual) and Free Spoken Digit Dataset (Audio). The pipeline is split into distinct stages for data preparation, encoding generation, simulation, evaluation, and visualization.
-
 ## Prerequisites
-
 1.  **Python 3.8+** installed.
 2.  **Git** installed (required for downloading FSDD).
+3.  **CUDA-capable GPU** (Recommended for faster training and simulation).
 
 ## Setup
 
@@ -27,14 +23,14 @@ python scripts/1_prepare_data.py
 *   **Output**: `data/processed/*.npy`, `data/spectrograms/train/*.npy`, `data/spectrograms/test/*.npy`
 
 ### 2. Generate Encodings
-Trains Autoencoders for both Visual (MNIST) and Audio (FSDD) modalities, then generates latent embeddings (encodings).
+Trains Autoencoders for both Visual (MNIST) and Audio (FSDD) modalities on the full datasets, then generates latent embeddings (encodings).
 ```bash
 python scripts/2_generate_encodings.py
 ```
 *   **Output**: `data/encodings/*.npy` (Train/Test encodings and labels)
 
-### 3. Run Hebbian Learning (Simulation)
-Runs the core Brain simulation. It initializes Cortices, feeds paired encodings (Visual + Audio), and allows the Brain to learn topology (Nodes/Clusters) and associations (CDZ) via Hebbian learning.
+### 3. Run TKBA Learning (Simulation)
+Runs the core Brain simulation using **Topological Kernel Bayesian ART (TKBA)**. It initializes Cortices, feeds paired encodings (Visual + Audio), and allows the Brain to learn topology (Nodes/Clusters) and associations (CDZ) dynamically.
 ```bash
 python scripts/3_run_TKBA.py
 ```
@@ -43,17 +39,24 @@ python scripts/3_run_TKBA.py
 ### 4. Evaluate
 Performs two types of evaluation:
 1.  **Supervised**: Linear probe (Logistic Regression) on raw encodings to verify embedding quality.
-2.  **Unsupervised**: Passes test data through the trained Brain, maps activated clusters to labels, and calculates clustering accuracy.
+2.  **Unsupervised**: Passes the full test set through the trained Brain, maps activated clusters to labels, and calculates clustering accuracy.
 ```bash
 python scripts/4_evaluate.py
 ```
 
 ### 5. Visualize
-Generates t-SNE plots to visualize the latent spaces of the Visual and Audio modalities.
+Generates t-SNE plots to visualize the latent spaces of the Visual and Audio modalities (Train and Test splits).
 ```bash
 python scripts/5_visualize.py
 ```
-*   **Output**: `data/plots/visual_tsne.png`, `data/plots/audio_tsne.png`
+*   **Output**: `data/plots/visual_train_tsne.png`, `data/plots/visual_test_tsne.png`, `data/plots/audio_train_tsne.png`, `data/plots/audio_test_tsne.png`
+
+## Optional: Hyperparameter Tuning
+If you wish to re-optimize the TKBA parameters for your specific environment:
+```bash
+python scripts/6_tune_hyperparams.py
+```
+*   **Output**: `src/best_config_found.py` (which you can manually merge into `src/config.py`)
 
 ## Troubleshooting
 
