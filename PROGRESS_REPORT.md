@@ -16,7 +16,7 @@ Building an **unsupervised multimodal learning system** capable of:
 
 ## 2. Development Roadmap & Logic
 ### Phase 1: The Foundation
-**Goal:** Migrate the outdated TensorFlow project to PyTorch with modern programming standards.
+**Goal:** Migrate the outdated TensorFlow 1.X project from FYP-1 to up to date PyTorch with modern programming standards.
 
 *   **What we did:**
     *   Built the **Brain Class**: The central controller.
