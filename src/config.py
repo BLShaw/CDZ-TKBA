@@ -2,7 +2,7 @@ class Config:
     # General
     DEVICE = 'cuda'  # Will be checked in main
     EPOCHS = 20
-    TRAINING_SET_SIZE = 55000  # Full Training Set Size
+    TRAINING_SET_SIZE = 55000  # 55K = Full Training Set Size
     
     # Brain Frequency
     BRN_CLEANUP_FREQUENCY = int(TRAINING_SET_SIZE * .25)
@@ -38,7 +38,7 @@ class Config:
     TKBA_VISUAL_SIGMA = 0.3
     TKBA_VISUAL_VIGILANCE = 0.45
     
-    # Audio (FSDD): Stable at these settings
+    # Audio (FSDD):
     TKBA_AUDIO_SIGMA = 0.15      
     TKBA_AUDIO_VIGILANCE = 0.45  
     
@@ -57,5 +57,5 @@ class Config:
     FSDD_LAYERS = [4096, 1024, 256, 64] 
     AE_LEARNING_RATE = 1e-3
     AE_BATCH_SIZE = 64
-    AE_EPOCHS_MNIST = 100 # Increased for better loss
-    AE_EPOCHS_FSDD = 150 # Increased for better loss
+    AE_EPOCHS_MNIST = 170
+    AE_EPOCHS_FSDD = 270
