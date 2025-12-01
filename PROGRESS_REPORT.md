@@ -62,7 +62,7 @@ Building an **unsupervised multimodal learning system** capable of:
 
 *   **Challenge 1: The "1 Node" Bug**: The Visual cortex refused to grow, staying at 1 node (11% accuracy).
     *   **Reason**: The Vigilance threshold was too loose; the brain thought *everything* looked like the first node.
-*   **Challenge 2: The "Explosion"**: After fixing the above, the node count hit the ceiling (6000) instantly.
+*   **Challenge 2: The "Explosion"**: After fixing the above, the node count hit the ceiling (6000) instantly. After further testing, this is a tradeoff for high accuracies
     *   **Reason**: Vigilance was too strict; the brain thought *everything* was unique.
 *   **Solution: Automated Hyperparameter Tuning**:
     *   We wrote a script (`scripts/6_tune_hyperparams.py`) to grid-search optimal TKBA parameters.
@@ -70,16 +70,16 @@ Building an **unsupervised multimodal learning system** capable of:
 
 ---
 
-## 3. Final Achievements
+## 3. Achievements So Far
 
 We have successfully built and tuned a full-scale unsupervised learning system.
 
-| Modality | Method | Accuracy (Unsupervised) | Clusters Created | Interpretation |
+| Modality | Method | Accuracy | Clusters Created | Interpretation |
 | :--- | :--- | :--- | :--- | :--- |
-| **Visual (MNIST)** | Linear Probe | **92.29%** | N/A | The Autoencoder learned excellent features. |
-| **Visual (MNIST)** | **TKBA Brain** | **90.11%** | ~3,300 | **Major Achievement**: Broke the 90% unsupervised accuracy barrier. The brain successfully clustered 60,000 digits with high purity. |
-| **Audio (FSDD)** | Linear Probe | **89.33%** | N/A | Good latent representation. |
-| **Audio (FSDD)** | **TKBA Brain** | **96.67%** | ~223 | The brain learned to distinguish spoken digits across different speakers with near-perfect robustness. |
+| **Visual (MNIST)** | Linear Probe (Supervised) | **92.29%** | N/A | The Autoencoder learned excellent features. |
+| **Visual (MNIST)** | **TKBA Brain** (Unsupervised) | **90.11%** | ~3,300 | **Major Achievement**: Broke the 90% unsupervised accuracy barrier. The brain successfully clustered 60,000 digits with high purity. |
+| **Audio (FSDD)** | Linear Probe (Supervised) | **89.33%** | N/A | Good latent representation. |
+| **Audio (FSDD)** | **TKBA Brain** (Unsupervised) | **96.67%** | ~230 | The brain learned to distinguish spoken digits across different speakers with near-perfect robustness. |
 
 ### Key Takeaway
 We moved from a simple prototype to a **mathematically rigorous, kernel-based topological learning system**. The system now behaves like a plastic neural substrate: it grows new neurons when it encounters novel information and refines existing ones when it sees familiar patterns, all without supervision.
