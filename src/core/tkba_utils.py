@@ -25,18 +25,7 @@ def cim(x, w, sigma):
         w = w[np.newaxis, :]
         
     D = x.shape[-1]
-    
-    # Kernel at 0 (Maximum similarity)
-    # TKBA implementation implies GaussKernel(0) = 1 for the simplified version, 
-    # or 1/(sqrt(2pi)*sig) for the full PDF.
-    # We will use the normalized version to ensure range [0, 1] approx.
-    # Note that the MATLAB code `CIM` function calculates `sqrt(ret0 - ret1)`.
-    # And `GaussKernel` is just exp(-sub^2...). So ret0 = 1.
     ret0 = 1.0
-    
-    # Kernel of differences (Component-wise)
-    # MATLAB: g_Kernel(:,i) = GaussKernel(X(i)-Y(:,i), sig);
-    # we compute the kernel for EACH dimension separately, then mean.
     
     diff = x - w # (N, D) broadcasted
     g_kernel = np.exp(-(diff**2) / (2 * sigma**2))
@@ -53,7 +42,7 @@ def kernel_bayes_rule(pattern, weight, count_cluster, sigma, kbr_sigma):
     Selects the best cluster using Kernel Bayes Rule.
     Returns posterior probabilities for each cluster.
     """
-    # optimized port of the MATLAB KBR logic
+    
     # pattern: (D,)
     # weight: (N, D)
     # count_cluster: (N,)
@@ -67,12 +56,7 @@ def kernel_bayes_rule(pattern, weight, count_cluster, sigma, kbr_sigma):
         prior = np.ones(N) / N
     else:
         prior = count_cluster / total_counts
-        
-    # In the full TKBA, KBR involves complex matrix inversions (Gram Matrices).
-    # For this integration, implementing the "Likelihood" part primarily via the Kernel,
-    # multiplied by Prior, which is the core of Naive Bayes.
-    # Note: Full KBR is O(N^3) due to matrix inversion, which is too slow for our 600+ nodes in real-time.
-    
+    # KBR is O(N^3) due to matrix inversion, which is too slow for 600+ nodes in real-time.
     # Approximate Posterior: Likelihood * Prior
     # Likelihood ~ Gaussian Kernel similarity in feature space
     likelihood = gaussian_kernel(pattern, weight, kbr_sigma)

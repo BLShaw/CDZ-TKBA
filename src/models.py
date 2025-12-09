@@ -9,7 +9,7 @@ class Autoencoder(nn.Module):
         encoder_layers = []
         for i in range(len(layers) - 1):
             encoder_layers.append(nn.Linear(layers[i], layers[i+1]))
-            # for standard AE, ReLU is better for hidden layers.
+            # Use ReLU for intermediate layers
             encoder_layers.append(nn.ReLU())
         self.encoder = nn.Sequential(*encoder_layers)
         
@@ -35,3 +35,14 @@ class Autoencoder(nn.Module):
     def get_encoding(self, x):
         with torch.no_grad():
             return self.encoder(x)
+
+    def decode(self, encoding):
+        with torch.no_grad():
+            # encoding might be numpy, convert to tensor
+            if not isinstance(encoding, torch.Tensor):
+                encoding = torch.tensor(encoding).float()
+            # Check device of model
+            device = next(self.parameters()).device
+            encoding = encoding.to(device)
+            
+            return self.decoder(encoding)

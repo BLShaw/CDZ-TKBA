@@ -18,8 +18,8 @@ from src.core.database import db
 param_grid = {
     'TKBA_VISUAL_SIGMA': [0.15, 0.3, 0.5],
     'TKBA_VISUAL_VIGILANCE': [0.45, 0.6, 0.75],
-    'TKBA_AUDIO_SIGMA': [0.15],      # Audio is stable
-    'TKBA_AUDIO_VIGILANCE': [0.45]   # Audio is stable
+    'TKBA_AUDIO_SIGMA': [0.15],   
+    'TKBA_AUDIO_VIGILANCE': [0.45]
 }
 
 # Reduced simulation steps for tuning speed (enough to see convergence trend)
@@ -29,12 +29,10 @@ def run_tuning_session(params):
     print(f"\n--- Testing Params: {params} ---")
     
     # A. Apply Params to Config (Runtime Patching)
-    # We patch the Config class attributes directly
     for k, v in params.items():
         setattr(Config, k, v)
         
     # B. Reset Database (Critical!)
-    # The global 'db' object retains state. We must clear it.
     db.nodes.data.clear()
     db.clusters.data.clear()
     db.nodes_to_clusters.data.clear()
@@ -48,13 +46,11 @@ def run_tuning_session(params):
         return 0, 0
 
     v_enc = np.load(os.path.join(enc_dir, 'visual_train_encodings.npy'))
-    # Use subset for tuning speed
+    # Using subset for tuning speed
     v_enc = v_enc[:10000] 
     
-    # We don't strictly need labels for the simulation, but we need them for evaluation score
     v_labels = np.load(os.path.join(enc_dir, 'visual_train_labels.npy'))[:10000]
     
-    # Audio
     has_audio = os.path.exists(os.path.join(enc_dir, 'audio_train_encodings.npy'))
     if has_audio:
         a_enc = np.load(os.path.join(enc_dir, 'audio_train_encodings.npy'))
@@ -92,13 +88,11 @@ def run_tuning_session(params):
         brain.create_new_nodes()
         
     # F. Evaluate (Internal Logic)
-    # We calculate Unsupervised Accuracy on the subset used
     def get_score(cortex, data, labels):
         if not cortex.node_manager.nodes: return 0.0
         
         cluster_map = {}
         for i in range(len(data)):
-            # Quick pass, no learning
             cluster = cortex.receive_sensory_input(data[i], learn=False)
             if cluster:
                 if cluster.name not in cluster_map: cluster_map[cluster.name] = []
@@ -143,7 +137,6 @@ def main():
         print(f"Trial {i+1}/{len(combinations)}")
         
         v_acc, a_acc = run_tuning_session(current_params)
-        
         score = v_acc
         
         if score > best_score:

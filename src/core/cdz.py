@@ -1,4 +1,5 @@
 from collections import deque
+from collections import defaultdict
 import numpy as np
 import scipy.signal as signal
 
@@ -18,7 +19,6 @@ class CDZ:
              gaussian = signal.gaussian(Config.CE_CORRELATION_WINDOW_MAX * 2, std=Config.CE_CORRELATION_WINDOW_STD, sym=True)
         else:
              # Fallback or raise
-             # For many scipy versions it is in signal.windows
              from scipy.signal import windows
              gaussian = windows.gaussian(Config.CE_CORRELATION_WINDOW_MAX * 2, std=Config.CE_CORRELATION_WINDOW_STD, sym=True)
 
@@ -31,8 +31,61 @@ class CDZ:
         self.PACKET_QUEUE_LENGTH = len(self.GAUSSIAN) + 1
         self.packet_queue = deque(maxlen=self.PACKET_QUEUE_LENGTH)
         self.correlations = {}
+        
+        # New: Track cluster firing frequency to penalize super-clusters
+        self.cluster_frequencies = defaultdict(int)
+
+    def update_competitive(self, v_cluster, a_cluster, penalty=1.0):
+        """
+        Explicit Competitive Hebbian Learning.
+        Strengthens the V-A link.
+        Actively WEAKENS the link between V and its OLD best A.
+        Actively WEAKENS the link between A and its OLD best V.
+        """
+        # 1. Ensure Correlations exist
+        if v_cluster.name not in self.correlations:
+            self.correlations[v_cluster.name] = ClusterCorrelation(v_cluster, self)
+        if a_cluster.name not in self.correlations:
+            self.correlations[a_cluster.name] = ClusterCorrelation(a_cluster, self)
+            
+        # 2. Find existing strongest partners (The "Old Beliefs")
+        v_conn = self.correlations[v_cluster.name]
+        a_conn = self.correlations[a_cluster.name]
+        
+        old_a_best, _ = v_conn.get_strongest_correlation()
+        old_v_best, _ = a_conn.get_strongest_correlation()
+        
+        # 3. Parameters
+        lr = self.LEARNING_RATE * penalty
+        
+        # 4. Excite Current (Hebbian)
+        v_conn.connections[a_cluster.name] += lr
+        a_conn.connections[v_cluster.name] += lr
+        
+        # 5. Inhibit Old (Anti-Hebbian)
+        # If V thought 'old_a_best' was the answer, but now sees 'a_cluster',
+        # punish the old link to force a switch.
+        if old_a_best and old_a_best.name != a_cluster.name:
+            v_conn.connections[old_a_best.name] -= lr * 0.5 # Punish half as hard as we learn
+            if v_conn.connections[old_a_best.name] < 0: v_conn.connections[old_a_best.name] = 0
+            
+        if old_v_best and old_v_best.name != v_cluster.name:
+            a_conn.connections[old_v_best.name] -= lr * 0.5
+            if a_conn.connections[old_v_best.name] < 0: a_conn.connections[old_v_best.name] = 0
+            
+        # 6. Normalize
+        v_conn._normalize()
+        a_conn._normalize()
+        
+        # 7. Update references
+        v_conn.cluster_objects[a_cluster.name] = a_cluster
+        a_conn.cluster_objects[v_cluster.name] = v_cluster
 
     def receive_packet(self, packet, learn=True):
+        # Track frequency
+        if learn:
+            self.cluster_frequencies[packet.cluster.name] += 1
+            
         for q_packet in self.packet_queue:
             if (packet.time - q_packet.time) >= Config.CE_CORRELATION_WINDOW_MAX:
                 break
@@ -84,10 +137,21 @@ class CDZ:
         if not self.correlations.get(new_packet.cluster.name):
             self.correlations[new_packet.cluster.name] = ClusterCorrelation(new_packet.cluster, self)
 
-        self.correlations[old_packet.cluster.name].update(old_packet, new_packet)
+        # Calculate Frequency Penalty
+        # Penalize the TARGET cluster if it fires too often.
+        # This prevents everyone from connecting to the "Rich" cluster.
+        target_freq = self.cluster_frequencies[new_packet.cluster.name]
+        
+        # Penalty factor: decay as 1 / sqrt(freq). Smoother than linear.
+        penalty = 1.0 / max(1.0, np.sqrt(target_freq))
+        
+        self.correlations[old_packet.cluster.name].update(old_packet, new_packet, penalty=penalty)
         self.correlations[new_packet.cluster.name].add_ref(old_packet.cluster)
 
     def remove_cluster(self, cluster):
+        if cluster.name in self.cluster_frequencies:
+            del self.cluster_frequencies[cluster.name]
+            
         if self.correlations.get(cluster.name):
             excited_by = self.correlations[cluster.name].ref_clusters
             excites = self.correlations[cluster.name].cluster_objects.values()

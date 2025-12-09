@@ -32,8 +32,6 @@ class NodeManager:
         # 1. Empty? Init
         if not self.nodes:
             self._add_node(encoding)
-            # Recursive call or return created node logic
-            # We just return the cluster of the new node
             new_node = self.nodes[-1]
             new_node.last_encoding = encoding
             cluster = new_node.get_strongest_cluster()
@@ -58,22 +56,9 @@ class NodeManager:
         if min_dist <= vigilance:
             # --- MATCH FOUND (Resonance) ---
             if learn:
-                # Move Winner
-                # In standard TKBA: weight = (count/(count+1))*weight + (1/(count+1))*pattern
                 winner_node.learn(encoding)
-                
-                # Topology Building: Winner-SecondWinner Edge
-                # if len(self.nodes) >= 2:
-                #     second_idx = np.argsort(dists)[1]
-                #     if dists[second_idx] <= vigilance:
-                #         second_node = self.nodes[second_idx]
-                #         # Create edge logic here if we implemented graph topology fully
-                #         pass
 
             strongest_cluster = winner_node.get_strongest_cluster()
-            
-            # Fire
-            # Strength could be function of distance: 1 - min_dist
             strength = 1.0 
             strongest_cluster.excite_cdz(strength, winner_node, learn=learn)
             return strongest_cluster
@@ -134,12 +119,10 @@ class NodeManager:
                         num_nodes_added += 1
                 
                 if created:
-                    # Original logic deletes old node.
                     node.teardown()
                     num_nodes_added -= 1
 
     def _delete_underutilized_items(self):
-        # TKBA lambda logic uses age or error so we stay with our utilization logic for now.
         for node in self.nodes[:]:
             if node.is_underutilized():
                 node.teardown()

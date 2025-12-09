@@ -9,7 +9,7 @@ class Brain:
         self.timestep = 0
         self.cortices = {}
         self.output_stream = deque(maxlen=10)
-        self.cdz = CDZ(self) # Initialized after assignment to self.cdz
+        self.cdz = CDZ(self)
 
     def add_cortex(self, cortex_name, autoencoder):
         if self.cortices.get(cortex_name):

@@ -10,7 +10,7 @@ class ClusterCorrelation:
         self.cluster_objects = {}
         self.ref_clusters = []
 
-    def update(self, q_packet, new_packet):
+    def update(self, q_packet, new_packet, penalty=1.0):
         assert q_packet.cluster == self.cluster
         assert q_packet.cortex != new_packet.cortex
 
@@ -22,7 +22,8 @@ class ClusterCorrelation:
         else:
              temporal_weight = 0
 
-        correlation_update = Config.CE_LEARNING_RATE * temporal_weight * new_packet.strength * q_packet.strength
+        # Apply penalty to prevent super-cluster dominance
+        correlation_update = Config.CE_LEARNING_RATE * temporal_weight * new_packet.strength * q_packet.strength * penalty
 
         self.connections[new_packet.cluster.name] += correlation_update
         self._normalize()

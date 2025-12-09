@@ -10,7 +10,8 @@
 Building an **unsupervised multimodal learning system** capable of:
 1.  Learning to classify visual digits (MNIST) and spoken digits (FSDD) without labels.
 2.  "Grounding" knowledge by associating vision and sound (e.g., learning that the image "7" corresponds to the sound "seven").
-3.  Using a **decoupled architecture** (separate sensory cortices connected by a Convergence-Divergence Zone or CDZ) rather than a single giant neural network.
+3.  **Generative Recall**: Demonstrating that seeing an image can trigger the "hallucination" of the corresponding sound, and vice versa.
+4.  Using a **decoupled architecture** (separate sensory cortices connected by a Convergence-Divergence Zone or CDZ) rather than a single giant neural network.
 
 ---
 
@@ -62,11 +63,22 @@ Building an **unsupervised multimodal learning system** capable of:
 
 *   **Challenge 1: The "1 Node" Bug**: The Visual cortex refused to grow, staying at 1 node (11% accuracy).
     *   **Reason**: The Vigilance threshold was too loose; the brain thought *everything* looked like the first node.
-*   **Challenge 2: The "Explosion"**: After fixing the above, the node count hit the ceiling (6000) instantly. After further testing, this is a tradeoff for high accuracies
+*   **Challenge 2: The "Explosion"**: After fixing the above, the node count hit the ceiling (6000) instantly.
     *   **Reason**: Vigilance was too strict; the brain thought *everything* was unique.
 *   **Solution: Automated Hyperparameter Tuning**:
     *   We wrote a script (`scripts/6_tune_hyperparams.py`) to grid-search optimal TKBA parameters.
     *   **Discovery**: The visual modality needed a stricter vigilance (0.45) but a slightly smoother kernel (Sigma=0.3) to balance detail with generalization. Audio required high sensitivity (Sigma=0.15).
+
+### Phase 6: Generative Demonstration & "Rich Get Richer" Fix
+**Goal:** Prove the "Association" capability (e.g., See "7" -> Say "Seven") and fix the "Super Cluster" dominance.
+
+*   **Issue**: Initial Audio -> Visual generation produced a "generic blob" for most digits.
+    *   **Cause**: A single Visual Cluster became a "super-attractor", linking to almost all Audio clusters due to the "Rich Get Richer" effect in Hebbian learning.
+*   **Fix 1**: Implemented a **Frequency Penalty** in the CDZ learning rule. Clusters that fire too frequently have their learning rate dynamically throttled (`1 / sqrt(frequency)`).
+*   **Fix 2**: Implemented **Competitive Hebbian Inhibition** (Oja's Rule) in the Refinement phase to actively punish incorrect "old" associations when a new, stronger one is found.
+*   **Result**: This successfully broke the monopoly of the super-cluster.
+*   **Demonstration**: Created `scripts/6_demo_generation.py` which now generates distinct, recognizable visual digits (via centroid decoding) from audio inputs, and vice-versa.
+*   **Audio Generation**: Implemented **Griffin-Lim** reconstruction to convert the generated spectrograms back into audible `.wav` files, proving the system can "speak" the digit it sees.
 
 ---
 
@@ -76,10 +88,10 @@ We have successfully built and tuned a full-scale unsupervised learning system.
 
 | Modality | Method | Accuracy | Clusters Created | Interpretation |
 | :--- | :--- | :--- | :--- | :--- |
-| **Visual (MNIST)** | Linear Probe (Supervised) | **92.29%** | N/A | The Autoencoder learned excellent features. |
-| **Visual (MNIST)** | **TKBA Brain** (Unsupervised) | **90.11%** | ~3,300 | **Major Achievement**: Broke the 90% unsupervised accuracy barrier. The brain successfully clustered 60,000 digits with high purity. |
+| **Visual (MNIST)** | Linear Probe (Supervised) | **92.07%** | N/A | The Autoencoder learned excellent features. |
+| **Visual (MNIST)** | **TKBA Brain** (Unsupervised) | **89.96%** | ~3,028 | **Major Achievement**: Achieved nearly 90% unsupervised accuracy. The brain successfully clustered 60,000 digits with high purity. |
 | **Audio (FSDD)** | Linear Probe (Supervised) | **89.33%** | N/A | Good latent representation. |
-| **Audio (FSDD)** | **TKBA Brain** (Unsupervised) | **96.67%** | ~230 | The brain learned to distinguish spoken digits across different speakers with near-perfect robustness. |
+| **Audio (FSDD)** | **TKBA Brain** (Unsupervised) | **92.33%** | ~155 | The brain learned to distinguish spoken digits across different speakers with excellent robustness. |
 
 ### Key Takeaway
-We moved from a simple prototype to a **mathematically rigorous, kernel-based topological learning system**. The system now behaves like a plastic neural substrate: it grows new neurons when it encounters novel information and refines existing ones when it sees familiar patterns, all without supervision.
+We moved from a simple prototype to a **mathematically rigorous, kernel-based topological learning system**. The system now behaves like a plastic neural substrate: it grows new neurons when it encounters novel information, refines existing ones when it sees familiar patterns.

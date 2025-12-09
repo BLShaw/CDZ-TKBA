@@ -80,7 +80,6 @@ def prepare_data():
     # If no files, attempt download
     if not wav_files:
         if os.path.exists(fsdd_dir):
-            # Directory exists but no wavs. Is it a git repo?
             if os.path.exists(os.path.join(fsdd_dir, '.git')):
                 print("  FSDD dir exists and is a git repo. Pulling...")
                 try:
@@ -170,7 +169,7 @@ def prepare_data():
             plt.imsave(os.path.join(subset_spec_dir, png_name), spec_np, cmap='gray')
             
             # Add to Aggregated List
-            # We keep the (1, 64, 64) shape for the AE input (N, 1, 64, 64)
+            # Keep the (1, 64, 64) shape for the AE input (N, 1, 64, 64)
             spec_tensor_np = Sxx_t.numpy() 
             
             if is_test:

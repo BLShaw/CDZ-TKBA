@@ -24,7 +24,6 @@ def run_hebbian():
         a_labels = np.load(os.path.join(enc_dir, 'audio_train_labels.npy'))
     
     # Initialize Brain
-    # We pass "None" for AEs because we are feeding pre-computed encodings directly.
     brain = Brain()
     v_cortex = brain.add_cortex('visual', None)
     a_cortex = brain.add_cortex('audio', None)
@@ -55,6 +54,10 @@ def run_hebbian():
                 aud_input = a_enc[idx_a]
         
         # Feed Brain
+        # Debug pairing for first few steps
+        if t < 10:
+            print(f"Debug Step {t}: Visual Label {label} <-> Audio Label {a_labels[idx_a] if aud_input is not None else 'None'}")
+
         brain.receive_sensory_input(v_cortex, vis_input)
         if aud_input is not None:
             brain.receive_sensory_input(a_cortex, aud_input)

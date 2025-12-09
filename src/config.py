@@ -2,7 +2,7 @@ class Config:
     # General
     DEVICE = 'cuda'  # Will be checked in main
     EPOCHS = 20
-    TRAINING_SET_SIZE = 55000  # 55K = Full Training Set Size
+    TRAINING_SET_SIZE = 55000  # Full Training Set Size
     
     # Brain Frequency
     BRN_CLEANUP_FREQUENCY = int(TRAINING_SET_SIZE * .25)
@@ -34,11 +34,10 @@ class Config:
     NODE_SPLIT_MAX_QTY = max(int(TRAINING_SET_SIZE / 1000), 5)
 
     # TKBA Settings
-    # Visual (MNIST):
     TKBA_VISUAL_SIGMA = 0.3
     TKBA_VISUAL_VIGILANCE = 0.45
     
-    # Audio (FSDD):
+    # Audio (FSDD): Stable at these settings
     TKBA_AUDIO_SIGMA = 0.15      
     TKBA_AUDIO_VIGILANCE = 0.45  
     
@@ -52,10 +51,9 @@ class Config:
     CE_CERTAINTY_AGE_FACTOR = NODE_CERTAINTY_AGE_FACTOR
 
     # Autoencoder Training
-    # Fixed dimensions to match input data: MNIST(784), FSDD(4096)
     MNIST_LAYERS = [784, 512, 256, 128] 
     FSDD_LAYERS = [4096, 1024, 256, 64] 
     AE_LEARNING_RATE = 1e-3
     AE_BATCH_SIZE = 64
-    AE_EPOCHS_MNIST = 170
-    AE_EPOCHS_FSDD = 270
+    AE_EPOCHS_MNIST = 100 
+    AE_EPOCHS_FSDD = 150 

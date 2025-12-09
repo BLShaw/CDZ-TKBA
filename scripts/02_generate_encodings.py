@@ -65,6 +65,7 @@ def generate_encodings():
     # Train on FULL dataset
     print("  Training Visual AE on full dataset...")
     train_autoencoder(visual_ae, X_train_flat, Config.AE_EPOCHS_MNIST, Config.AE_BATCH_SIZE, device)
+    torch.save(visual_ae.state_dict(), 'data/visual_ae.pth')
     
     # Helper for encoding generation
     def get_encs(model, data_tensor):
@@ -106,6 +107,7 @@ def generate_encodings():
             
             print("  Training Audio AE...")
             train_autoencoder(audio_ae, X_a_train_flat, Config.AE_EPOCHS_FSDD, Config.AE_BATCH_SIZE, device)
+            torch.save(audio_ae.state_dict(), 'data/audio_ae.pth')
             
             print("  Generating Audio Encodings...")
             with torch.no_grad():

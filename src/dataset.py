@@ -15,7 +15,6 @@ class MultimodalDataset:
         self.mnist_dir = os.path.join(root_dir, 'mnist')
         self.fsdd_root = os.path.join(root_dir, 'fsdd') 
         
-        # Only init data structures, don't load everything unless accessed
         self.mnist_data = None
         self.fsdd_data = None
         self.fsdd_labels = None

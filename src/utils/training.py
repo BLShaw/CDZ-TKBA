@@ -20,8 +20,8 @@ def train_autoencoder(model, data, epochs, batch_size, device='cpu'):
         tensor_data = torch.from_numpy(data).float()
     elif isinstance(data, torch.Tensor):
         tensor_data = data.float()
-    elif isinstance(data, datasets.MNIST): # This wont work directly
-         pass 
+    elif isinstance(data, datasets.MNIST):
+        pass 
     else:
         # Assume standard list of tensors
         tensor_data = torch.stack(data).float()

@@ -29,10 +29,8 @@ class Cortex:
         encoding = None
         
         if isinstance(data, torch.Tensor):
-            # Ensure it's on the right device for the model
             if hasattr(self.autoencoder, 'get_encoding'):
                 with torch.no_grad():
-                    # Ensure correct device
                     device = next(self.autoencoder.parameters()).device
                     if data.device != device:
                         data = data.to(device)
@@ -40,7 +38,6 @@ class Cortex:
                     encoded_tensor = self.autoencoder.get_encoding(data)
                     encoding = encoded_tensor.cpu().numpy().flatten()
             else:
-                # No encoder, assume raw tensor is the encoding
                 encoding = data.cpu().numpy().flatten()
                 
         elif isinstance(data, np.ndarray):

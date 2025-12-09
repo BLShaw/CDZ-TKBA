@@ -63,7 +63,6 @@ def evaluate():
         db.node_manager_to_nodes.data = db_state['node_manager_to_nodes']
         print("Database state restored.")
     else:
-        # Legacy or direct brain dump (won't work if DB is empty)
         brain = data_dump
         print("Warning: Only Brain loaded. Database might be empty (Nodes won't work).")
 
@@ -83,7 +82,6 @@ def evaluate():
         # Iterate.
         for i in range(len(encodings)):
             # receive_sensory_input returns the cluster object
-            # set learn=False
             cluster = cortex.receive_sensory_input(encodings[i], learn=False)
             if cluster:
                 if cluster.name not in cluster_map:
